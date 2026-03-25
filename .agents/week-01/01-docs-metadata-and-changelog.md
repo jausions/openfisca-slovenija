@@ -106,4 +106,3 @@ that the payroll model is complete.
 - render/read `README.md`
 - run a TOML parse check if available
 - run any existing metadata/lint checks relevant to packaging
-

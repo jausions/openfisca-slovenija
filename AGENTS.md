@@ -26,7 +26,7 @@ When working in this repository, follow these documents in this order:
 4. the relevant file in `.agents/week-01/` or `.agents/week-02/`
 5. `CHANGELOG.md` for release/history expectations
 
-If two sources seem inconsistent:
+If two sources seem inconsistent, ask for clarification, but in the meantime:
 
 - prefer the higher-ranked source
 - keep the change minimal
@@ -231,4 +231,3 @@ Unless a task says otherwise:
 - prefer explicitness over cleverness
 - prefer documented uncertainty over invented legislation
 - keep code and tests readable for non-Slovenian maintainers
-
