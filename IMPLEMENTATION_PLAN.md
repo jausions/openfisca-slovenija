@@ -1,6 +1,6 @@
 # OpenFisca Slovenia — Implementation Plan
 
-> Document version: 0.4.0 (2026-03-25)
+> Document version: 0.5.0 (2026-03-25)
 > Status: Draft
 
 ---
@@ -183,10 +183,10 @@ Do not mix prefixed and un-prefixed versions of the same variable family.
 
 For v1, keep the entity model minimal:
 
-| Entity      | Purpose                                                          |
-|-------------|------------------------------------------------------------------|
-| `Person`    | All individual-level payroll variables                           |
-| `Household` | Household-level context: spouse status, child count              |
+| Entity      | Purpose                                             |
+|-------------|-----------------------------------------------------|
+| `Person`    | All individual-level payroll variables              |
+| `Household` | Household-level context: spouse status, child count |
 
 A `Person`-level flag `je_glavni_delodajalec` handles the main-employer vs
 secondary-employer distinction without requiring a separate `Employer` entity.
@@ -618,6 +618,21 @@ country-package recommendation in `CONTRIBUTING.md`.
 ---
 
 ## 10. Immediate Next Steps (Week 1–2)
+
+To make implementation easier to dispatch to coding agents, the week 1–2 work is
+split into dedicated task briefs under `.agents/`:
+
+- `.agents/README.md` — overview, sequencing, and handoff rules
+- `.agents/week-01/01-docs-metadata-and-changelog.md`
+- `.agents/week-01/02-core-parameters-2026-payroll.md`
+- `.agents/week-01/03-core-payroll-variables.md`
+- `.agents/week-01/04-core-payroll-tests-and-payslip-check.md`
+- `.agents/week-02/05-allowances-secondary-employer-and-regres.md`
+- `.agents/week-02/06-examples-and-template-cleanup.md`
+
+Each task file defines scope, dependencies, target files, deliverables, and
+acceptance criteria. Agents should follow the sequencing unless an earlier task
+explicitly marks part of the work as unblockable in parallel.
 
 ### Days 1–3
 - [ ] Update `README.md` to describe the real Slovenia package (remove the

@@ -57,7 +57,8 @@ installation.
 
 If you prefer to manually manage the release and distribution of your package,
 follow the guidelines provided by the
-[Python Packaging Authority](https://python-packaging-user-guide.readthedocs.io/tutorials/distributing-packages/#packaging-your-project).
+[Python Packaging
+Authority](https://python-packaging-user-guide.readthedocs.io/tutorials/distributing-packages/#packaging-your-project).
 
 This involves detailed steps on preparing your package, creating distribution
 files, and uploading them to PyPI.
@@ -84,7 +85,8 @@ To create a virtual environment, launch a terminal on your computer, `cd` into
 your directory and follow these instructions:
 
 ```sh
-python3 -m venv .venv # create a new virtual environment in the “.venv” folder, which will contain all dependencies
+python3 -m venv .venv # create a new virtual environment in the
+                      # ".venv" folder, which will contain all dependencies
 source .venv/bin/activate # activate the venv
 ```
 
@@ -180,7 +182,8 @@ pip install --editable ".[dev]" --upgrade
 You can make sure that everything is working by running the provided tests with
 `make test`.
 
-> [Learn more about tests](https://openfisca.org/doc/coding-the-legislation/writing_yaml_tests.html)
+> [Learn more about
+> tests](https://openfisca.org/doc/coding-the-legislation/writing_yaml_tests.html)
 
 :tada: This OpenFisca Country Package is now installed and ready!
 

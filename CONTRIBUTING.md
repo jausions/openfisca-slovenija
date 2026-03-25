@@ -80,9 +80,9 @@ Each change must be documented with the following elements:
 - `Tax and benefit system evolution`: Calculation improvement, fix, or update.
   Impacts the users interested in calculations.
 
-- `Technical improvement`: Performances improvement, installing process change,
-  formula syntax change… Impacts the users who write legislation and/or deploy
-  their own instance.
+- `Technical improvement`: Performances improvement, installing process
+  change, formula syntax change… Impacts the users who write legislation
+  and/or deploy their own instance.
 
 - `Crash fix`: Impact all reusers.
 
