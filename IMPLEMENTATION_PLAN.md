@@ -220,6 +220,10 @@ When the first known effective date is earlier than 2026, encode it from that
 date. When a rate is not yet known for a future year, leave it absent; the
 engine will use the last known value until a new entry is added.
 
+For parameters such as `minimalna_placa`, model values by **effective date**,
+not as a year-locked constant. In practice this is often annual (January), but
+dated entries must allow non-annual updates when legislation introduces them.
+
 ### 4.1 Suggested parameter tree
 
 ```
@@ -244,7 +248,7 @@ parameters/
     splosna_olajava.yaml         # general allowance base + extra allowance formula
     olajave_za_vzdrzzevane.yaml  # dependent allowances (child, spouse)
   zaposlitev/
-    minimalna_placa.yaml         # national minimum wage by year
+    minimalna_placa.yaml         # national minimum wage by effective date
     povprecna_placa.yaml         # national average gross wage placeholder (SURS)
     malica/
       dnevni_znesek.yaml         # tax-exempt cap per workday
