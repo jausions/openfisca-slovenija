@@ -1,6 +1,6 @@
 # OpenFisca Slovenia — Implementation Plan
 
-> Document version: 0.3.0 (2026-03-25)
+> Document version: 0.4.0 (2026-03-25)
 > Status: Draft
 
 ---
@@ -594,6 +594,27 @@ The following are explicitly deferred to avoid scope creep:
 | Annual summary payslip (due Jan 31)                 | Administrative output, not a legislative rule |
 | Self-employment income                              | Different contribution and tax rules          |
 
+### 9.1 Release and changelog discipline
+
+Maintain `CHANGELOG.md` for every merged change, following the OpenFisca
+country-package recommendation in `CONTRIBUTING.md`.
+
+- Use **SemVer**:
+  - **Patch**: fix or improve an existing calculation
+  - **Minor**: add a new variable or user-facing feature
+  - **Major**: rename or remove a public variable/API
+- Treat the changelog update as part of the **definition of done** for changes
+  to variables, parameters, entities, reforms, tests, or package metadata.
+- Each changelog entry must include:
+  - version number and pull request link in the heading
+  - change type (`Tax and benefit system evolution`, `Technical improvement`,
+    `Crash fix`, or `Minor change`)
+  - impacted periods with exact dates when legislation/calculations change
+  - impacted areas as repository-relative model paths
+  - explicit user-facing details describing what changed and why it matters
+- If one pull request contains several distinct user-visible changes, split them
+  into separate changelog paragraphs using `<!-- -->`.
+
 ---
 
 ## 10. Immediate Next Steps (Week 1–2)
@@ -602,6 +623,8 @@ The following are explicitly deferred to avoid scope creep:
 - [ ] Update `README.md` to describe the real Slovenia package (remove the
   fictional country template text)
 - [ ] Update `pyproject.toml` metadata (description, author, URLs)
+- [ ] Adopt changelog discipline: update `CHANGELOG.md` with each merged change
+  using OpenFisca SemVer and entry structure
 - [ ] Create parameter files for employee SSC, employer SSC, DO, and OZP
 - [ ] Create parameter files for 2026 PIT brackets and allowances
 - [ ] Create parameter files for minimum wage and employment allowances
