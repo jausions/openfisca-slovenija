@@ -1,14 +1,21 @@
 # OpenFisca Slovenia — Implementation Plan
 
-> Document version: 0.1.0 (2026-03-24)
+> Document version: 0.3.0 (2026-03-25)
 > Status: Draft
 
 ---
 
 ## 1. Overview and v1 Scope
 
-**Target**: a monthly employment payroll model for Slovenia, covering the **2026**
-tax year.
+**Target**: a time-aware monthly employment payroll model for Slovenia. OpenFisca
+natively supports parameter values that change over time; this package must use
+that capability so that any year can be simulated by supplying the appropriate
+dated parameter values.
+
+**First encoded year**: **2026**. The initial implementation encodes 2026
+legislation and rates as the seed dataset. This is the baseline for testing and
+validation, not a permanent ceiling. New years are added by appending dated
+entries to parameter YAML files — no code changes required.
 
 **Population in scope**: salaried employees who are tax residents in Slovenia,
 employed by a single employer, full-time.
@@ -49,8 +56,43 @@ languages of the modelled country**. For Slovenia that means **Slovenian**.
 - Parameter paths → Slovenian or English are both acceptable; prefer Slovenian
   domain terms where they are unambiguous
 - Labels and metadata → Slovenian
-- Code comments → Slovenian preferred
+- Code comments → Slovenian preferred, **with English explanations for non-Slovenian developers**
 - Python infrastructure (`class`, `def`, module names) → English
+
+### 2.2.1 English comment rule for code maintenance
+
+Every Slovenian term, variable name, or concept used in code **must** be
+accompanied by an inline English comment on the same line or immediately above.
+This ensures that developers without Slovenian language knowledge can understand
+the intent and maintain the code.
+
+**Format:**
+
+```python
+# Determine bruto_placa (gross salary in EUR)
+bruto_placa = base_salary + seniority_bonus
+
+# Calculate prispevki_delavca (employee social contributions)
+employee_contributions = gross_salary * 0.2310
+
+# Apply splosna_olajava (general personal tax allowance)
+taxable_base = max(0, income - allowance)
+```
+
+**Scope:**
+- All variable names and parameter keys (at definition and first use in a section)
+- All entity or attribute names
+- Domain-specific acronyms (PIZ, DO, OZP, etc.) on first mention in a code block
+- Mathematical or logical operations with semantic significance
+- All docstrings for functions, classes, or modules using Slovenian terms
+
+**Not required for:**
+- Standard Python keywords and library functions
+- Generic comments that do not reference Slovenian terms
+- Comments already clear from context in a short file
+
+This policy ensures that code reviews, debugging, and future refactoring remain
+accessible to all team members, regardless of language background.
 
 ### 2.3 Acronyms
 
@@ -156,8 +198,27 @@ concurrent-contract modelling becomes a real requirement.
 
 ## 4. Parameters
 
-Organise parameters by payroll domain. Each file should cover one concept and
-include dated entries so that annual updates are tracked.
+Organise parameters by payroll domain. Each file covers one concept and uses
+**dated entries** so that annual updates are tracked without code changes.
+
+### 4.0 Time-aware parameter convention
+
+All parameter files must use OpenFisca's `values` block with ISO date keys so
+that the engine resolves the correct value for any simulation date automatically:
+
+```yaml
+# Example: parameters/prispevki/delavec/PIZ.yaml
+description: Stopnja prispevka za pokojninsko in invalidsko zavarovanje (PIZ) delavca
+  # Employee pension and disability insurance (PIZ) contribution rate
+values:
+  2026-01-01:
+    value: 0.1550
+  # Add new entries here when rates change — no code changes required
+```
+
+When the first known effective date is earlier than 2026, encode it from that
+date. When a rate is not yet known for a future year, leave it absent; the
+engine will use the last known value until a new entry is added.
 
 ### 4.1 Suggested parameter tree
 
@@ -197,7 +258,11 @@ parameters/
       stevilo_dni.yaml           # employer-covered period (30 days)
 ```
 
-### 4.2 Key 2026 values to encode
+### 4.2 Seed parameter values (2026 — first encoded year)
+
+The values below are the initial dataset to encode. They serve as the seed for
+testing and validation. Future years are added by appending new dated entries to
+the relevant YAML files.
 
 #### Employee social contributions (on gross salary)
 
@@ -285,6 +350,23 @@ variables/
   dodatki.py         # allowances and reimbursements (malica, regres, prevoz)
   bolnisca.py        # sick leave
   izplacilo.py       # net pay and employer cost outputs
+```
+
+**Important:** When implementing variables, every Slovenian term in the code must
+have an accompanying English comment (see section 2.2.1 for format and scope).
+Example docstring format:
+
+```python
+class bruto_placa(Variable):
+    """Bruto plača (gross salary).
+    
+    Agreed monthly gross salary in EUR, before any deductions.
+    Used as the contribution base for social security and tax calculations.
+    """
+    definition_period = MONTH
+    entity = Person
+    value_type = float
+    default_value = 0
 ```
 
 ### 5.2 Inputs (Person-level)
@@ -395,7 +477,7 @@ map to these categories:
 ### Milestone 1 — Core monthly payroll (v1)
 
 Goal: simulate a realistic Slovenian monthly payslip for a full-time salaried
-employee in 2026, without allowances or sick leave.
+employee, without allowances or sick leave, using the seed parameter values.
 
 Scope:
 - taxable earnings (`bruto_placa` and components)
@@ -409,7 +491,7 @@ Scope:
 
 Success criterion: given a gross salary, spouse status, and first-child flag,
 the model produces the correct net salary and employer cost, matching a
-manually verified 2026 payslip.
+manually verified payslip at the simulation date.
 
 ### Milestone 2 — Allowances and reimbursements (v1.1)
 
@@ -529,7 +611,7 @@ The following are explicitly deferred to avoid scope creep:
 - [ ] Write YAML tests for PIT bracket edges
 - [ ] Write YAML tests for OZP flat behaviour
 - [ ] Write YAML tests for dependent allowances
-- [ ] Verify against a manually computed 2026 payslip
+- [ ] Verify against a manually computed payslip (using 2026 seed parameters)
 
 ### Week 2
 - [ ] Add `malica` and `povracilo_prevoza`
