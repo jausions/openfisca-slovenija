@@ -56,6 +56,10 @@ Add focused YAML tests for:
 - PIT bracket edges around each threshold
 - secondary-employer 25% flat withholding
 
+For week-2 readiness, reserve test structure for split receipts
+(`*_izplacano`, `*_neobdavceno`, `*_obdavceno`) so taxable excess
+and decomposition identity are easy to add without test rewrites.
+
 ### 2. Integration scenarios
 
 Add end-to-end cases for at least:
@@ -101,6 +105,8 @@ Record:
 - at least one integrated scenario validates the full payslip chain
 - manual verification results are recorded in a place future
   agents can find
+- test layout is compatible with split allowance variables to be
+  introduced in week 2
 
 ## Suggested verification
 

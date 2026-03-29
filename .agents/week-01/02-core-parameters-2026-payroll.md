@@ -22,6 +22,8 @@ Create or reorganise parameter files for:
 - PIT allowances
 - national minimum wage
 - employment-related caps/minima needed by week-1 and week-2 variables
+- exemption and taxable-excess treatment for allowances and reimbursements
+  used in week-2 variables
 
 ## Dependencies
 
@@ -56,6 +58,10 @@ Existing placeholder files likely to be replaced or retired later:
 - Add clear descriptions
 - When Slovenian terms appear in descriptions/comments, add an
   English explanation nearby
+- For receipts with partial exemption, encode enough parameters to
+  compute paid, exempt, and taxable portions
+- If PIT and SSC treatment differs for a receipt, model separate
+  PIT and SSC treatment parameters by effective date
 
 ### 2. Minimum parameter set for milestone 1
 
@@ -89,6 +95,13 @@ placeholders/seed values for:
 - `zaposlitev/regres/izjema_obsega.yaml`
 - `zaposlitev/bolnisca/stopnja_nadomestila.yaml`
 - `zaposlitev/bolnisca/stevilo_dni.yaml`
+
+For allowance/reimbursement decomposition, add seed parameters for:
+
+- `zaposlitev/malica/` exemption cap and taxable-excess treatment
+- `zaposlitev/prevoz/` exemption rule and taxable-excess treatment
+- `zaposlitev/regres/` exemption caps and taxable-excess treatment
+  (`letni` and `zimski`)
 
 ### 3. PIT structure
 
@@ -124,6 +137,8 @@ paths for task 06 cleanup.
 - no new parameter file is named after a specific year
 - enough descriptions/context exist for non-Slovenian maintainers
   to follow the model
+- allowance/reimbursement parameters are sufficient to compute
+  `*_izplacano`, `*_neobdavceno`, and `*_obdavceno` in week 2
 
 ## Suggested verification
 

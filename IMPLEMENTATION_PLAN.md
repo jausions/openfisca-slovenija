@@ -143,10 +143,18 @@ Do not mix prefixed and un-prefixed versions of the same variable family.
 | Performance pay                  | `delovna_uspesnost`                   |
 | Overtime pay                     | `nadure`                              |
 | Wage compensation                | `nadomestilo_place`                   |
-| Meal allowance                   | `malica`                              |
-| Transport reimbursement          | `povracilo_prevoza`                   |
-| Summer holiday allowance         | `letni_regres`                        |
-| Winter allowance                 | `zimski_regres`                       |
+| Meal allowance paid              | `malica_izplacano`                    |
+| Meal allowance tax-free          | `malica_neobdavceno`                  |
+| Meal allowance taxable           | `malica_obdavceno`                    |
+| Transport reimbursement paid     | `povracilo_prevoza_izplacano`         |
+| Transport reimbursement tax-free | `povracilo_prevoza_neobdavceno`       |
+| Transport reimbursement taxable  | `povracilo_prevoza_obdavceno`         |
+| Summer allowance paid            | `letni_regres_izplacano`              |
+| Summer allowance tax-free        | `letni_regres_neobdavceno`            |
+| Summer allowance taxable         | `letni_regres_obdavceno`              |
+| Winter allowance paid            | `zimski_regres_izplacano`             |
+| Winter allowance tax-free        | `zimski_regres_neobdavceno`           |
+| Winter allowance taxable         | `zimski_regres_obdavceno`             |
 | Employee SSC base                | `osnova_za_prispevke_delavca`         |
 | Employee pension contribution    | `prispevki_delavca_PIZ`               |
 | Employee health contribution     | `prispevki_delavca_zdravstvo`         |
@@ -340,6 +348,11 @@ at or below the threshold.
 | Employer sick pay rate                 | 80 % of salary                                   |
 | Employer sick pay period               | First 30 days                                    |
 
+For each allowance/reimbursement that may be partly exempt, model dedicated
+parameters for exemption caps and taxable excess treatment by effective date.
+When PIT and SSC treatment differs, encode distinct PIT and SSC treatment
+parameters instead of assuming they are identical.
+
 ---
 
 ## 5. Variables
@@ -384,7 +397,8 @@ nadure                         # overtime pay (optional)
 nadomestilo_place              # wage compensation (sick leave, holiday, etc.)
 delovni_dnevi_v_mesecu        # working days in the month
 malica_na_dan                  # meal allowance rate per workday (≤ cap)
-povracilo_prevoza              # transport reimbursement (monthly, tax-exempt per rules)
+povracilo_prevoza              # transport reimbursement input (monthly, employer-set);
+                               # split outputs (izplacano/neobdavceno/obdavceno) are computed
 je_glavni_delodajalec          # boolean: True if this is the main employer
 meseci_zaposlitve              # months employed in the calendar year (for proration)
 ```
@@ -429,7 +443,11 @@ olajava_za_zakonca             # spouse dependent allowance (if eligible)
 olajava_za_prvega_otroka       # first child allowance
 skupne_olajave                 # sum of applicable allowances
 
-dohodnina_osnova               # max(0, bruto_placa − prispevki_delavca − prispevki_delavca_DO − skupne_olajave)
+dohodnina_osnova               # max(0, bruto_placa + malica_obdavceno
+                               #   + povracilo_prevoza_obdavceno
+                               #   + letni_regres_obdavceno
+                               #   + zimski_regres_obdavceno
+                               #   − prispevki_delavca − skupne_olajave)
 akontacija_dohodnine           # monthly PIT withholding (main employer: bracket scale ÷ 12;
                                #   secondary employer: 25% flat of dohodnina_osnova)
 ```
@@ -437,11 +455,29 @@ akontacija_dohodnine           # monthly PIT withholding (main employer: bracket
 #### Allowances and reimbursements
 
 ```python
-malica                         # meal allowance (workdays × min(rate, cap)); SSC and PIT exempt up to cap
-povracilo_prevoza              # transport reimbursement; tax-exempt per rules
-letni_regres                   # summer holiday allowance; mandatory, prorated; PIT/SSC exempt ≤ avg gross wage
-zimski_regres                  # winter allowance; mandatory, prorated; PIT/SSC exempt ≤ ½ avg gross wage
+malica_izplacano               # paid meal allowance
+malica_neobdavceno             # tax-free meal allowance portion
+malica_obdavceno               # taxable meal allowance portion
+
+povracilo_prevoza_izplacano    # paid transport reimbursement
+povracilo_prevoza_neobdavceno  # tax-free transport portion
+povracilo_prevoza_obdavceno    # taxable transport portion
+
+letni_regres_izplacano         # paid summer allowance (mandatory, prorated)
+letni_regres_neobdavceno       # exempt summer allowance portion
+letni_regres_obdavceno         # taxable summer allowance portion
+
+zimski_regres_izplacano        # paid winter allowance (mandatory, prorated)
+zimski_regres_neobdavceno      # exempt winter allowance portion
+zimski_regres_obdavceno        # taxable winter allowance portion
 ```
+
+For each receipt above, enforce identity:
+
+`<prejemek>_izplacano = <prejemek>_neobdavceno + <prejemek>_obdavceno`.
+
+Taxable portions (`*_obdavceno`) feed PIT and SSC bases according to dated
+parameters for each concept.
 
 #### Sick leave
 
@@ -453,9 +489,12 @@ nadomestilo_place_bolnisca     # employer-paid sick pay = 80% × daily_rate × d
 #### Outputs
 
 ```python
-neto_placa                     # bruto_placa − prispevki_delavca − prispevki_delavca_DO − OZP − akontacija_dohodnine
-izplacilo_delavcu              # neto_placa + malica + povracilo_prevoza (+ regres lines when paid)
-strosek_delodajalca            # bruto_placa + prispevki_delodajalca + prispevki_delodajalca_DO + malica + povracilo_prevoza
+neto_placa                     # bruto_placa − prispevki_delavca − OZP − akontacija_dohodnine
+izplacilo_delavcu              # neto_placa + malica_izplacano + povracilo_prevoza_izplacano
+                               #   + letni_regres_izplacano + zimski_regres_izplacano
+strosek_delodajalca            # bruto_placa + prispevki_delodajalca + malica_izplacano
+                               #   + povracilo_prevoza_izplacano
+                               #   + letni_regres_izplacano + zimski_regres_izplacano
 ```
 
 ---
@@ -470,8 +509,8 @@ map to these categories:
 |------------------------------------------------|---------------------------------------------------------------------------|
 | Salary (`plača`)                               | `osnovna_placa`, `dodatek_za_delovno_dobo`, `nadure`, `delovna_uspesnost` |
 | Wage compensation (`nadomestilo plače`)        | `nadomestilo_place`, `nadomestilo_place_bolnisca`                         |
-| Reimbursements (`povračila stroškov`)          | `malica`, `povracilo_prevoza`                                             |
-| Other employment receipts (`drugi prejemki`)   | `letni_regres`, `zimski_regres`                                           |
+| Reimbursements (`povračila stroškov`)          | `malica_izplacano`, `povracilo_prevoza_izplacano`                         |
+| Other employment receipts (`drugi prejemki`)   | `letni_regres_izplacano`, `zimski_regres_izplacano`                       |
 | Taxes and contributions (`davki in prispevki`) | All `prispevki_*`, `OZP`, `akontacija_dohodnine`                          |
 
 ---
@@ -502,16 +541,21 @@ manually verified payslip at the simulation date.
 Goal: add mandatory payroll items beyond regular salary.
 
 Scope:
-- meal allowance (`malica`) with workday-based calculation and cap
-- transport reimbursement (`povracilo_prevoza`)
-- summer holiday allowance (`letni_regres`) with:
+- meal allowance (`malica_*`) with workday-based calculation, cap, and
+  paid/exempt/taxable split (`malica_izplacano`, `malica_neobdavceno`,
+  `malica_obdavceno`)
+- transport reimbursement (`povracilo_prevoza_*`) with explicit
+  paid/exempt/taxable split
+- summer holiday allowance (`letni_regres_*`) with:
   - mandatory minimum (= national minimum wage)
   - proration for partial-year employment
-  - PIT/SSC exemption up to average gross wage cap
-- winter allowance (`zimski_regres`) with:
+  - paid/exempt/taxable split (`letni_regres_izplacano`,
+    `letni_regres_neobdavceno`, `letni_regres_obdavceno`)
+- winter allowance (`zimski_regres_*`) with:
   - mandatory minimum (= half national minimum wage)
   - proration
-  - PIT/SSC exemption up to half average gross wage cap
+  - paid/exempt/taxable split (`zimski_regres_izplacano`,
+    `zimski_regres_neobdavceno`, `zimski_regres_obdavceno`)
 
 Success criterion: the model can simulate a payslip for a month in which a
 regres payment is made, with correct exemption behaviour.
@@ -559,14 +603,20 @@ Cover each rule in isolation:
 - meal allowance at exactly 4 hours/day eligibility boundary
 - regres proration for 6 months employed
 - regres exemption below and above the average gross wage cap
+- decomposition identity per receipt:
+  `izplacano = neobdavceno + obdavceno`
+- one-cent above-cap tests for taxable excess
+- PIT/SSC base propagation of `*_obdavceno` portions
 
 ### Integration tests (end-to-end payslip scenarios)
 
 - single employee, no dependents
 - married employee, non-working spouse, one child
 - secondary employer
-- employee receiving letni_regres in July
-- employee receiving zimski_regres in December
+- employee receiving `letni_regres_izplacano` in July
+  (with split exempt/taxable outputs)
+- employee receiving `zimski_regres_izplacano` in December
+  (with split exempt/taxable outputs)
 - employee with 10 sick days in a month
 
 ### Regression tests
@@ -656,11 +706,14 @@ explicitly marks part of the work as unblockable in parallel.
 - [ ] Verify against a manually computed payslip (using 2026 seed parameters)
 
 ### Week 2
-- [ ] Add `malica` and `povracilo_prevoza`
+- [ ] Add `malica_izplacano`, `malica_neobdavceno`, `malica_obdavceno`
+      and `povracilo_prevoza_*` equivalents
 - [ ] Add `je_glavni_delodajalec` and secondary-employer flat withholding
-- [ ] Add `letni_regres` and `zimski_regres` (v1.1 scope)
-- [ ] Write regres proration and exemption tests
-- [ ] Add 3–5 complete situation examples in `situation_examples/`
+- [ ] Add `letni_regres_*` and `zimski_regres_*` split variables (v1.1 scope)
+- [ ] Write regres proration, exemption, and decomposition identity tests
+- [ ] Write taxable-excess tests for malica and regres
+- [ ] Add at least 5 complete situation examples in `situation_examples/`,
+      including one with taxable excess on an allowance or regres
 - [ ] Review and remove all placeholder template variables and tests
 
 ---

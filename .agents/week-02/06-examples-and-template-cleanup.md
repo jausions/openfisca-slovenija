@@ -13,7 +13,7 @@ direction.
 
 ## Scope
 
-- add 3–5 complete situation examples under `situation_examples/`
+- add at least 5 complete situation examples under `situation_examples/`
 - review legacy template variables, parameters, reforms, and tests
 - remove, replace, or clearly deprecate placeholder content once
   Slovenia replacements exist
@@ -89,6 +89,8 @@ Minimum recommended example set:
 3. secondary-employer case with flat withholding
 4. employee receiving `letni_regres`
 5. employee with `malica` and `povracilo_prevoza`
+6. at least one case with taxable excess on an allowance or regres
+   (above exemption cap)
 
 Each example should include:
 
@@ -98,6 +100,8 @@ Each example should include:
   week 1–2
 - enough expected outputs to show how the package is meant to be
   used
+- split receipt outputs where relevant (`*_izplacano`,
+  `*_neobdavceno`, `*_obdavceno`)
 
 ### 2. Cleanup decision rule
 
@@ -144,7 +148,9 @@ After cleanup:
 
 ## Acceptance criteria
 
-- at least 3 complete Slovenia-specific situation examples exist
+- at least 5 complete Slovenia-specific situation examples exist
+- at least one example includes taxable excess with split outputs
+  (`*_izplacano`, `*_neobdavceno`, `*_obdavceno`)
 - no prominent user-facing file still presents the fictional template
   legislation as current behaviour
 - removed placeholder files are not still imported or referenced

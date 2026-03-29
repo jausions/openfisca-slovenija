@@ -166,6 +166,9 @@ Important coverage themes from the plan:
 - secondary-employer 25% withholding
 - meal allowance caps and boundaries
 - regres proration and exemption boundaries
+- decomposition identity for split receipts:
+  `*_izplacano = *_neobdavceno + *_obdavceno`
+- taxable-excess (`*_obdavceno`) propagation into PIT and SSC bases
 
 ## 8. Changelog and versioning discipline
 

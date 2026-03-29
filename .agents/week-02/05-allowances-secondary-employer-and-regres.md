@@ -48,13 +48,14 @@ Implement using:
 - tax-exempt cap from parameters
 - minimum-hours eligibility threshold
 
-Define clearly whether the model returns:
+Model all three values explicitly:
 
-- the paid amount,
-- the exempt amount,
-- and/or the taxable excess.
+- `malica_izplacano` (paid amount)
+- `malica_neobdavceno` (exempt amount)
+- `malica_obdavceno` (taxable excess)
 
-If only one variable is introduced now, document the simplification.
+Enforce identity in formulas/tests:
+`malica_izplacano = malica_neobdavceno + malica_obdavceno`.
 
 ### 2. Transport reimbursement (`povracilo_prevoza`)
 
@@ -62,6 +63,12 @@ Implement the simplest rule set supported by confirmed
 sources. If the exemption method is not yet fully sourced, keep
 the variable modular and document the limitation rather than
 guessing.
+
+Even with simplified rules, expose split outputs:
+
+- `povracilo_prevoza_izplacano`
+- `povracilo_prevoza_neobdavceno`
+- `povracilo_prevoza_obdavceno`
 
 ### 3. Main vs secondary employer
 
@@ -81,8 +88,12 @@ Implement:
   defined in the plan
 - proration by `meseci_zaposlitve`
 - exemption ceilings based on average gross wage fractions
-- clear separation between gross amount and exempt/taxable
-  treatment if needed by future reforms/tests
+- mandatory split outputs for each receipt:
+  - `*_izplacano`
+  - `*_neobdavceno`
+  - `*_obdavceno`
+- clear PIT and SSC treatment of `*_obdavceno` portions using
+  dated parameters
 
 ### 5. Testing focus
 
@@ -94,6 +105,9 @@ Add tests for:
 - exemption below/above threshold
 - secondary-employer withholding interaction if changed in
   this task
+- decomposition identity for each split receipt
+- one-cent-above-cap cases that produce taxable excess
+- PIT/SSC base propagation of `*_obdavceno` values
 
 ## Deliverables
 
@@ -108,6 +122,9 @@ Add tests for:
 - exemption boundaries are tested
 - unresolved transport-rule assumptions are documented
   explicitly instead of hardcoded silently
+- split outputs (`*_izplacano`, `*_neobdavceno`, `*_obdavceno`)
+  exist for `malica`, `povracilo_prevoza`, `letni_regres`,
+  and `zimski_regres`
 
 ## Suggested verification
 

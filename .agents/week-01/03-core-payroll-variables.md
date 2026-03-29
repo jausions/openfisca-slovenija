@@ -115,6 +115,13 @@ Keep `malica`, `povracilo_prevoza`, `letni_regres`,
 `zimski_regres`, and sick leave out of milestone-1 outputs
 unless a zero-default placeholder is strictly needed.
 
+If placeholders are introduced for week-2 compatibility, reserve
+the split naming convention now to avoid public renames later:
+
+- `*_izplacano` (paid amount)
+- `*_neobdavceno` (tax-free amount)
+- `*_obdavceno` (taxable amount)
+
 ## Deliverables
 
 - milestone-1 payroll formulas implemented
